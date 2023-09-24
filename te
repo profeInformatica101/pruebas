@@ -1,0 +1,37 @@
+public boolean guardarImagen(Integer id, String fileName, InputStream fileContent) {
+    try (Connection con = DriverManager.getConnection(
+            SystemInfo.getInstance().getUserKey("URL"),
+            SystemInfo.getInstance().getUserKey("USUARIO"),
+            SystemInfo.getInstance().getUserKey("CLAVE"))) {
+
+        // Verificar si ya existe una imagen con el mismo ID
+        PreparedStatement checkStmt = con.prepareStatement("SELECT id FROM imagenes WHERE id = ?");
+        checkStmt.setInt(1, id);
+        ResultSet checkResult = checkStmt.executeQuery();
+
+        if (checkResult.next()) {
+            // Ya existe una imagen con el mismo ID, actualiza la imagen
+            PreparedStatement updateStmt = con.prepareStatement(
+                    "UPDATE imagenes SET nombre = ?, imagen = ? WHERE id = ?");
+            updateStmt.setString(1, fileName);
+            updateStmt.setBlob(2, fileContent);
+            updateStmt.setInt(3, id);
+
+            return updateStmt.executeUpdate() > 0;
+        } else {
+            // No existe una imagen con el mismo ID, realiza la inserción
+            PreparedStatement insertStmt = con.prepareStatement(
+                    "INSERT INTO imagenes (id, nombre, imagen) VALUES (?, ?, ?)");
+            insertStmt.setInt(1, id);
+            insertStmt.setString(2, fileName);
+            insertStmt.setBlob(3, fileContent);
+
+            return insertStmt.executeUpdate() > 0;
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.out.println(e.toString());
+        return false;
+    }
+}
