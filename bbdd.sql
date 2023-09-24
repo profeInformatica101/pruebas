@@ -1,0 +1,8 @@
+CREATE DATABASE IF NOT EXISTS mi_bbdd_proyecto;
+USE mi_bbdd_proyecto;
+
+CREATE TABLE IF NOT EXISTS imagenes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  imagen BLOB NOT NULL 
+);
